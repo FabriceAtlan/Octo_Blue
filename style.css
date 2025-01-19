@@ -1,0 +1,18 @@
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100vw;
+	height: 100vh;
+	background: radial-gradient(#6477e3, #2b338d);
+}
+#canvas {
+	border: 5px solid #20266d;
+	border-radius: 1.125rem;
+	background: radial-gradient(circle, #6477e3 5%, #2c3981 80%);
+}

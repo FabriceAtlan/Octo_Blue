@@ -1,11 +1,17 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+const dist = (x1, y1, x2, y2) => {
+	return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
 canvas.width = 600;
 canvas.height = 600;
 
 const tileSet = "./assets/tileset.png";
 const bullet = "./assets/bullet.png";
+const happyFish = "./assets/happyFishImage.png";
+
 let imageBullet;
 
 const spOcto = {
@@ -51,35 +57,29 @@ class Hero extends Actor {
 	}
 
 	update() {
-		if (keys.rotateLeft) this.angle -= 2;
-		if (keys.rotateRight) this.angle += 2;
+		if (keys.right) this.x += 3.5;
+		if (keys.left) this.x -= 3.5;
 		if (keys.space) {
 			keys.space = false;
 			
-			const angle = Math.abs(this.angle);// * Math.PI / 180;
-			console.log(angle);
-			
-			const spawnBulletX = this.x + (Math.cos(angle) * 12);
-			const spawnBulletY = this.y + (Math.sin(angle) * 18);
-
 			const newBullet = new Bullet(
 				imageBullet,
-				spawnBulletX,
-				spawnBulletY
+				this.x + this.quadWidth/2 - 6,
+				this.y + this.quadHeight/2 + 15
 			);
-
-			newBullet.angle = Math.abs(angle);
-			console.log("Bullet angle: ", newBullet.angle)
 
 			bulletHero.push(newBullet);
 		};
+
+		if (this.x + this.quadWidth >= canvas.width) {
+			this.x = canvas.width - this.quadWidth;
+		} else if (this.x <= 0) {
+			this.x = 0;
+		}
 	};
 
 	draw() {
 		if (this.image) {
-			ctx.save();
-			ctx.translate(canvas.width/2, canvas.height/2);
-			ctx.rotate(this.angle * Math.PI / 180);
 			ctx.drawImage(
 				this.image,
 				this.quadX, this.quadY,
@@ -87,8 +87,6 @@ class Hero extends Actor {
 				this.x, this.y,
 				this.quadWidth, this.quadHeight
 			);
-			ctx.translate(-canvas.width/2, -canvas.height/2);
-			ctx.restore();
 		}
 	}
 }
@@ -105,7 +103,7 @@ class Fish extends Actor {
 
 		if (this.x - this.quadWidth >= canvas.width || this.x  + this.quadWidth <= -this.quadWidth) {
 			this.dir *= -1;
-			this.y = Math.random() * ((canvas.height - this.quadHeight) - this.quadHeight) + this.quadHeight;
+			this.y = Math.random() * ((canvas.height - this.quadHeight) - 180) + 180;
 			this.speed = Math.random() * (2 - .8) + .8;
 		};
 	}
@@ -124,6 +122,7 @@ class Fish extends Actor {
 					0, 0,
 					this.quadWidth, this.quadHeight
 				);
+
 				ctx.translate(-this.x + this.quadWidth, this.y);
 
 			} else {
@@ -135,6 +134,7 @@ class Fish extends Actor {
 					0, 0,
 					this.quadWidth, this.quadHeight
 				);
+
 				ctx.translate(-this.x, this.y);
 			}
 
@@ -149,22 +149,29 @@ class Bullet extends Actor {
 	}
 
 	update() {
-		const forceX = Math.cos(this.angle) * 2;
-		const forceY = Math.sin(this.angle) * 2;
+		this.y += 5;
 
-		this.x += forceX;
-		this.y += forceY;
+		for (let i = bulletHero.length - 1; i >= 0; i-- ) {
+			const bullet = bulletHero[i];
+
+			if (bullet.y > canvas.height) {
+				bulletHero.splice(i, 1);
+			}
+
+			for (let j = listFish.length - 1; j >= 0; j-- ) {
+				const fish = listFish[j];
+
+				if (dist(fish.x + fish.quadWidth/2, fish.y, bullet.x, bullet.y) <= 25) {
+					if (fish.happyFishImage) fish.quadX === 152 ? fish.quadX = 199 : fish.quadX = 152;
+					bulletHero.splice(i, 1);
+				}
+
+			}
+		}
 	}
 
 	draw() {
-		ctx.save();
-		ctx.translate(canvas.width/2, canvas.height/2);
-		ctx.rotate(this.angle * Math.PI / 180);
-
 		ctx.drawImage(imageBullet, this.x, this.y);
-
-		ctx.translate(-canvas.width/2, -canvas.height/2);
-		ctx.restore();
 	}
 }
 
@@ -180,8 +187,8 @@ async function imageLoader(src) {
 }
 
 const keys = {
-	rotateRight: false,
-	rotateLeft: false,
+	right: false,
+	left: false,
 	space: false
 };
 
@@ -191,26 +198,27 @@ async function startGame() {
 
 	// Create Hero
 	const octoImage = await imageLoader(tileSet);
-	const octo = new Hero(spOcto, 0, 0);
+	const octo = new Hero(spOcto, canvas.width/2, 0);
 	
 	octo.image = octoImage; 
 	octo.x -= octo.quadWidth/2; 
-	octo.y -= octo.quadHeight/2;
+	octo.y = 20;
 	
 	// Create ennemies
 	const fishImage = await imageLoader(tileSet);
+	const happyFishImage = await imageLoader(tileSet);
 
 	for (let i = 0; i < 10; i++) {
 		let rndPositionX = 0;
 		const spawnDice = Math.random() < .5 ? "left" : "right";
 		
 		if (spawnDice === "left") {
-			rndPositionX = Math.random() * (- 100 - 50) - 50;
-			directionLeftOrRight = -1;
+			rndPositionX = Math.random() * (150 - 50) - 50;
+			directionLeftOrRight = 1;
 
 		} else {
-			rndPositionX = Math.random() * ((canvas.width + 50) - (canvas.width + 50)) + (canvas.width + 50);
-			directionLeftOrRight = 1;
+			rndPositionX = Math.random() * ((canvas.width + 150) - (canvas.width + 50)) + 50;
+			directionLeftOrRight = -1;
 		}
 
 		const newFish = new Fish(
@@ -220,19 +228,21 @@ async function startGame() {
 			directionLeftOrRight
 		);
 		
-		newFish.image = fishImage; 
+		newFish.image = fishImage;
+		newFish.happyFishImage = happyFishImage;
+		
 		newFish.x -= newFish.quadWidth/2; 
 		newFish.y -= newFish.quadHeight/2;
 		
 		listFish.push(newFish);
-		
+
 		listFish[i].speed = Math.random() * (2 - .1) + .1;
-		listFish[i].y = Math.random() * ((canvas.height - 50) - 50) + 50
+		listFish[i].y = Math.random() * ((canvas.height - 50) - 180) + 180
 	}
-	
+
 	function gameLoop() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		
+
 		// Hero
 		octo.update();
 		octo.draw();
@@ -267,8 +277,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 	await startGame();
 
 	document.addEventListener("keydown", (e) => {
-		if (e.key === "ArrowRight") keys.rotateRight = true;
-		if (e.key === "ArrowLeft") keys.rotateLeft = true;
+		if (e.key === "ArrowRight") keys.right = true;
+		if (e.key === "ArrowLeft") keys.left = true;
 		if (e.key === " " && !spaceIsPressed) {
 			e.preventDefault();
 			keys.space = true;
@@ -277,8 +287,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 	});
 	
 	document.addEventListener("keyup", (e) => {
-		if (e.key === "ArrowRight") keys.rotateRight = false;
-		if (e.key === "ArrowLeft") keys.rotateLeft = false;
+		if (e.key === "ArrowRight") keys.right = false;
+		if (e.key === "ArrowLeft") keys.left = false;
 		if (e.key === " ") {
 			e.preventDefault();
 			keys.space = false;

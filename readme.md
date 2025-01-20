@@ -1,7 +1,8 @@
 # OCTO blue | Game Jam de D'JAMBO
 
-<img src="./assets/octoblue.png" width="300" style="display: block;padding: 1.125;margin: 0 auto">
-
+<div align="center">
+	<img src="./assets/octoblue.png" width="300" style="display: block;padding: 1.125;margin: 0 auto">
+</div>
 
 ## Sommaire
 
@@ -24,7 +25,6 @@
 
 ### Présentation de la Game Jam [^](#sommaire)
 
-
 La D'jambo est une game jam en ligne qui s'est déroulée du **vendredi 17 janvier 2025** à 18h au **dimanche 19 janvier 2025** à 18h. Les participants disposaient de **48 heures** pour créer un **jeu vidéo** en solo ou en équipe de 1 à 5 personnes.
 
 Le thème de cette édition était **Monochrome**, dévoilé au début de l'événement. Les participants étaient libres d'utiliser la technologie de leur choix (Godot, Unreal, Unity, etc.) pour développer des jeux destinés aux **plateformes mobiles**, **desktop** ou **web**, adaptés aux **écrans tactiles**, **claviers/souris** ou **manettes**.
@@ -45,7 +45,9 @@ The theme of this edition was **Monochrome**, revealed at the start of the event
   <img src="./assets/octo.png" width="150">
 </div>
 
-<img src="./assets/octo-blue.gif" width="300" style="display: block;padding: 1.125;margin: 0 auto">
+<div align="center">
+	<img src="./assets/octo-blue.gif" width="300">
+</div>
 
 ### Français
 

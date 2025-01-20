@@ -41,8 +41,8 @@ The theme of this edition was **Monochrome**, revealed at the start of the event
 
 ## À propos du jeu | About the Game [^](#sommaire)
 
-<div style="text-align: center;">
-  <img src="./assets/octo.png" width="150" style="padding: 1.125rem; margin-bottom: 2rem;">
+<div align="center">
+  <img src="./assets/octo.png" width="150">
 </div>
 
 <img src="./assets/octo-blue.gif" width="300" style="display: block;padding: 1.125;margin: 0 auto">

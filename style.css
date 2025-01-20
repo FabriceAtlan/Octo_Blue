@@ -16,3 +16,18 @@ body {
 	border-radius: 1.125rem;
 	background: radial-gradient(circle, #6477e3 5%, #2c3981 80%);
 }
+.bubble {
+  width: 100px;
+  height: 100px;
+  background-image: url('tileset-bubble.png');
+  background-repeat: no-repeat;
+  animation: animateBubble 1s steps(5) infinite;
+}
+@keyframes animateBubble {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -30 0;
+  }
+}

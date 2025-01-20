@@ -11,6 +11,7 @@ canvas.height = 600;
 const tileSet = "./assets/tileset.png";
 const bullet = "./assets/bullet.png";
 const happyFish = "./assets/happyFishImage.png";
+const tilesetBubbleImage = './assets/tilesetBubble.png';
 
 let imageBullet;
 
@@ -30,8 +31,8 @@ const spFish = {
 	speed: 2
 };
 
+const listBubble = [];
 const listFish = [];
-
 const bulletHero = [];
 
 class Actor {
@@ -175,6 +176,44 @@ class Bullet extends Actor {
 	}
 }
 
+let lastTime = 0;
+const frameDuration = 300
+		
+class Bubble {
+	constructor(coordX, coordY) {
+		this.x = coordX;
+		this.y = coordY;
+		
+		this.frameWidth = 30;
+		this.frameHeight = 30;
+		this.totalFrames = 5;
+		this.currentFrame = 0;
+		this.image = tilesetBubble;
+	}
+
+	update(timestamp) {
+		const deltaTime = timestamp - lastTime;
+
+		if (deltaTime > frameDuration) {
+			this.currentFrame = (this.currentFrame + 1) % this.totalFrames;
+			lastTime = timestamp;
+		}
+	}
+
+	draw() {
+		const sx = this.currentFrame * this.frameWidth;
+		const sy = 0;
+
+		ctx.drawImage(
+			tilesetBubble,
+			sx, sy,
+			this.frameWidth, this.frameHeight,
+			this.x, this.y,
+			this.frameWidth, this.frameHeight
+		);
+	}
+}
+
 async function imageLoader(src) {
 	const img = new Image();
 	img.src = src;
@@ -193,6 +232,18 @@ const keys = {
 };
 
 async function startGame() {
+	// Create bubbles
+	tilesetBubble = await imageLoader(tilesetBubbleImage);
+
+	for (let i = 0; i < 5; i++) {
+		const newBubble = new Bubble(
+			Math.random() * ((canvas.width - 30) - 30) + 30,
+			Math.random() * ((canvas.height - 30) - 30) + 30,
+		);
+
+		listBubble.push(newBubble);
+	}
+
 	// Create bullet
 	imageBullet = await imageLoader(bullet);
 
@@ -240,8 +291,18 @@ async function startGame() {
 		listFish[i].y = Math.random() * ((canvas.height - 50) - 180) + 180
 	}
 
-	function gameLoop() {
+	function gameLoop(timestamp) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		// Bubble
+		if (listBubble.length > 0) {
+			for (let i=0; i < listBubble.length; i++) {
+				const currentBubble = listBubble[i];
+
+				currentBubble.update(timestamp);
+				currentBubble.draw();
+			}
+		}
 
 		// Hero
 		octo.update();
